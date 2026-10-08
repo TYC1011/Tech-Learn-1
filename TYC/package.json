@@ -1,0 +1,20 @@
+{
+  "name": "tyc-math-rpg",
+  "version": "1.0.0",
+  "description": "勇者四則運算大冒險 - 國小數學RPG教育遊戲",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "math",
+    "rpg",
+    "game",
+    "education"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "TYC",
+  "license": "MIT"
+}

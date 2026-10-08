@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>勇者算術大冒險：拯救王國四則運算</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+TC:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-app">
+        <!-- 頂部導航/狀態列 -->
+        <header id="top-navbar">
+            <div class="nav-brand">
+                <span class="brand-icon">🏰</span>
+                <span class="brand-title">勇者算術大冒險</span>
+            </div>
+
+            <div class="nav-center-devices">
+                <div class="device-pill-group">
+                    <button class="device-toggle-btn" data-device="desktop" title="切換為電腦模式">💻 電腦</button>
+                    <button class="device-toggle-btn active" data-device="tablet" title="切換為平板模式 (預設)">📱 平板</button>
+                    <button class="device-toggle-btn" data-device="mobile" title="切換為手機模式">📲 手機</button>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <button id="backpack-btn" class="nav-mini-btn backpack-btn" title="查看成就與錯題筆記本">🎒 背包</button>
+                <button id="reset-adventure-btn" class="nav-mini-btn btn-rebirth" onclick="GameApp.promptResetAllAdventure()" title="重生並重新開始冒險進度">🔄 重生</button>
+                <div id="user-header-info" class="user-badge hidden">
+                    <span class="user-icon">🧙‍♂️</span>
+                    <span id="current-username-badge">勇者</span>
+                    <button id="logout-btn" class="nav-mini-btn" title="登出">登出</button>
+                </div>
+                <button id="sound-toggle-btn" class="nav-mini-btn">🔊 音效: 開</button>
+                <button id="admin-btn" class="nav-mini-btn admin-btn">🔑 後台管理</button>
+            </div>
+        </header>
+
+        <!-- 畫面 1: 登入 / 註冊 / 遊客 封面 -->
+        <main id="screen-auth" class="game-screen">
+            <div class="auth-container">
+                <div class="pixel-banner">
+                    <h1 class="game-title">勇者算術大冒險</h1>
+                    <p class="game-subtitle">★ 國小四年級整數四則運算 勇者討伐魔龍 ★</p>
+                    <div class="banner-hero-art">
+                        <!-- 勇者向量角色 -->
+                        <div class="hero-preview-avatar">
+                            <svg viewBox="0 0 100 100" class="hero-svg-icon">
+                                <!-- 披風 -->
+                                <path d="M25 45 C15 50 10 75 22 85 C35 75 40 65 35 48 Z" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                                <path d="M75 45 C85 50 90 75 78 85 C65 75 60 65 65 48 Z" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+                                <!-- 身體藍衣 -->
+                                <rect x="34" y="48" width="32" height="30" rx="4" fill="#2563eb" stroke="#1e3a8a" stroke-width="2"/>
+                                <rect x="34" y="65" width="32" height="6" fill="#78350f"/>
+                                <rect x="46" y="64" width="8" height="8" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
+                                <!-- 雙腿靴子 -->
+                                <rect x="37" y="78" width="10" height="12" rx="2" fill="#92400e"/>
+                                <rect x="53" y="78" width="10" height="12" rx="2" fill="#92400e"/>
+                                <!-- 頭部與臉部 -->
+                                <circle cx="50" cy="40" r="22" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+                                <!-- 刺蝟褐髮 -->
+                                <path d="M25 35 L32 15 L40 26 L50 10 L60 26 L68 15 L75 35 L76 46 L70 42 L65 45 L50 36 L35 45 L30 42 L24 46 Z" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+                                <!-- 金額環與紅寶石 -->
+                                <path d="M28 35 Q50 30 72 35" stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round"/>
+                                <circle cx="50" cy="31" r="5" fill="#ef4444" stroke="#f59e0b" stroke-width="1.5"/>
+                                <!-- 眼睛與堅毅神情 -->
+                                <ellipse cx="42" cy="42" rx="3.5" ry="4.5" fill="#0f172a"/>
+                                <ellipse cx="58" cy="42" rx="3.5" ry="4.5" fill="#0f172a"/>
+                                <circle cx="43" cy="40" r="1.2" fill="#fff"/>
+                                <circle cx="59" cy="40" r="1.2" fill="#fff"/>
+                                <path d="M38 35 L45 37" stroke="#78350f" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M62 35 L55 37" stroke="#78350f" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M46 50 Q50 52 54 50" stroke="#b45309" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <!-- 右手持劍 -->
+                                <g transform="translate(18, 25) rotate(-20)">
+                                    <path d="M10 0 L15 10 L12 45 L8 45 L5 10 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+                                    <line x1="10" y1="5" x2="10" y2="45" stroke="#94a3b8" stroke-width="1"/>
+                                    <rect x="2" y="45" width="16" height="4" rx="1" fill="#f59e0b" stroke="#b45309" stroke-width="1"/>
+                                    <rect x="8" y="49" width="4" height="12" fill="#92400e"/>
+                                    <circle cx="10" cy="62" r="3" fill="#f59e0b"/>
+                                </g>
+                                <!-- 左手盾牌 (黃金邊緣) -->
+                                <g transform="translate(68, 48)">
+                                    <path d="M0 0 L20 0 C22 18 18 32 10 38 C2 32 -2 18 0 0 Z" fill="#fef08a" stroke="#d97706" stroke-width="3"/>
+                                    <path d="M4 4 L16 4 C18 16 14 26 10 30 C6 26 2 16 4 4 Z" fill="#fff" stroke="#f59e0b" stroke-width="1"/>
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- 排行榜按鈕 -->
+                    <div style="text-align: center; margin: 10px 0 4px 0;">
+                        <button id="leaderboard-open-btn" class="pixel-btn pixel-btn-secondary" onclick="GameApp.openLeaderboard()" style="font-size: 13px; padding: 6px 22px; letter-spacing: 1px;">🏆 排行榜</button>
+                    </div>
+                </div>
+
+                <div class="auth-card">
+                    <div class="auth-tabs">
+                        <button id="tab-login" class="auth-tab-btn active">⚔️ 勇者登入</button>
+                        <button id="tab-register" class="auth-tab-btn">📜 新勇者註冊</button>
+                    </div>
+
+                    <!-- 登入表單 -->
+                    <div id="login-box" class="auth-form-box">
+                        <form id="login-form">
+                            <div class="form-group">
+                                <label for="login-server-select">選擇伺服器 (001~999)</label>
+                                <div class="server-input-wrap">
+                                    <input type="text" id="login-server-select" class="pixel-input server-field" value="001" maxlength="3" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-account">帳號 (ID 或 用戶名)</label>
+                                <input type="text" id="login-account" class="pixel-input" placeholder="請輸入 ID 或 用戶名" required autocomplete="username">
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">密碼</label>
+                                <input type="password" id="login-password" class="pixel-input" placeholder="請輸入密碼" required autocomplete="current-password">
+                            </div>
+                            <button type="submit" class="pixel-btn pixel-btn-primary full-width">立即啟程冒險</button>
+                        </form>
+                    </div>
+
+                    <!-- 註冊表單 -->
+                    <div id="register-box" class="auth-form-box hidden">
+                        <form id="register-form">
+                            <div class="form-group">
+                                <label for="reg-server-select">選擇伺服器 (001~999)</label>
+                                <div class="server-input-wrap">
+                                    <input type="text" id="reg-server-select" class="pixel-input server-field" value="001" maxlength="3" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-username">用戶名 (5 個字以內)</label>
+                                <input type="text" id="reg-username" class="pixel-input" placeholder="例如：超強勇者" maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-password">密碼 (英數字 10 位以內)</label>
+                                <input type="password" id="reg-password" class="pixel-input" placeholder="例如：pass123" maxlength="10" required>
+                            </div>
+                            <div class="id-alloc-notice">
+                                🛡️ 專屬勇者 ID 將於註冊時由系統自動配發！
+                            </div>
+                            <button type="submit" class="pixel-btn pixel-btn-success full-width">註冊並領取專屬 ID</button>
+                        </form>
+                    </div>
+
+                    <div class="guest-divider">
+                        <span>或</span>
+                    </div>
+                    <button id="guest-btn" class="pixel-btn pixel-btn-secondary full-width">🎒 遊客模式登入</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 畫面 2: 冒險大地圖 / 關卡選擇 -->
+        <main id="screen-map" class="game-screen hidden">
+            <div class="map-container">
+                <div class="map-header">
+                    <h2>🗺️ 王國冒險地圖</h2>
+                    <p class="map-desc">勇者呀，魔龍抓走了無辜的人質！請依序通過試煉，取得傳奇裝備討伐魔龍！</p>
+
+                    <div class="equipment-inventory">
+                        <div class="inventory-title">🎒 傳奇神裝包：</div>
+                        <div id="map-badge-sword" class="equip-badge" title="第2關通過獲得">
+                            <span class="equip-icon">🗡️</span>
+                            <span class="equip-name">傳說之劍</span>
+                        </div>
+                        <div id="map-badge-shield" class="equip-badge" title="第3關通過獲得">
+                            <span class="equip-icon">🛡️</span>
+                            <span class="equip-name">重生之盾</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="levels-grid">
+                    <!-- 第 1 關: 迷霧森林 -->
+                    <div id="card-level1" class="level-card unlocked">
+                        <div class="card-badge">Level 1</div>
+                        <div class="card-art forest-art">🌲 🐻 🏃‍♂️</div>
+                        <h3 class="card-title">迷霧森林</h3>
+                        <p class="card-type">單一加減乘除 (複習關)</p>
+                        <div class="card-rule" id="card-rule-l1">必須全對通關 ｜ 0重來3星, 5次內2星, 5次以上1星</div>
+                        <div class="card-stats">
+                            <span class="stars-display" id="l1-stars">☆☆☆</span>
+                            <span class="status-tag" id="l1-status">進行中</span>
+                        </div>
+                        <button class="pixel-btn pixel-btn-primary card-action-btn" onclick="GameApp.startLevel1()">進入森林 ➔</button>
+                    </div>
+
+                    <!-- 第 2 關: 魔法村莊 -->
+                    <div id="card-level2" class="level-card locked">
+                        <div class="lock-overlay" id="l2-lock-overlay">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-text">需逃離迷霧森林</div>
+                        </div>
+                        <div class="card-badge">Level 2</div>
+                        <div class="card-art village-art">🏘️ ⚒️ ✨</div>
+                        <h3 class="card-title">魔法村莊</h3>
+                        <p class="card-type">連續四則運算 (判斷優先順序)</p>
+                        <div class="card-rule" id="card-rule-l2">需對 4/5 題 ｜ 全對3星, 錯1題2星, 錯2題1星 ｜ 獲【傳說之劍】</div>
+                        <div class="card-stats">
+                            <span class="stars-display" id="l2-stars">☆☆☆</span>
+                            <span class="status-tag" id="l2-status">未解鎖</span>
+                        </div>
+                        <button class="pixel-btn pixel-btn-primary card-action-btn" onclick="GameApp.startLevel2()">進行附魔 ➔</button>
+                    </div>
+
+                    <!-- 第 3 關: 神殿祕寶 -->
+                    <div id="card-level3" class="level-card locked">
+                        <div class="lock-overlay" id="l3-lock-overlay">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-text">需獲得傳說之劍</div>
+                        </div>
+                        <div class="card-badge">Level 3</div>
+                        <div class="card-art temple-art">🏛️ 🚪 💎</div>
+                        <h3 class="card-title">神殿祕寶</h3>
+                        <p class="card-type">連續四則運算 (計算石門密碼)</p>
+                        <div class="card-rule" id="card-rule-l3">需對 4/5 題 ｜ 全對3星, 錯1題2星, 錯2題1星 ｜ 獲【重生之盾】</div>
+                        <div class="card-stats">
+                            <span class="stars-display" id="l3-stars">☆☆☆</span>
+                            <span class="status-tag" id="l3-status">未解鎖</span>
+                        </div>
+                        <button class="pixel-btn pixel-btn-primary card-action-btn" onclick="GameApp.startLevel3()">開啟神殿 ➔</button>
+                    </div>
+
+                    <!-- 魔王關: 討伐魔龍 -->
+                    <div id="card-boss" class="level-card locked boss-card">
+                        <div class="lock-overlay" id="boss-lock-overlay">
+                            <div class="lock-icon">🔒</div>
+                            <div class="lock-text">需獲得重生之盾</div>
+                        </div>
+                        <div class="card-badge boss-badge">BOSS 決戰</div>
+                        <div class="card-art dragon-art">🌋 🐉 🔥</div>
+                        <h3 class="card-title">討伐魔龍</h3>
+                        <p class="card-type">混和四則運算 (招式對決)</p>
+                        <div class="card-rule">魔龍 5 血 ｜ 勇者 3 命 ｜ 扣0血3星, 扣1血2星, 扣2血1星</div>
+                        <div class="card-stats">
+                            <span class="stars-display" id="boss-stars">☆☆☆</span>
+                            <span class="status-tag" id="boss-status">未解鎖</span>
+                        </div>
+                        <button class="pixel-btn pixel-btn-danger card-action-btn" onclick="GameApp.startBoss()">討伐魔龍 ➔</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 畫面 3: Level 1 迷霧森林 (動態奔跑、上下樹林向左滾動、分岔路選擇) -->
+        <main id="screen-level1" class="game-screen hidden">
+            <div class="level-container">
+                <div class="level-topbar">
+                    <button class="pixel-btn-secondary back-to-map-btn">⬅ 返回地圖</button>
+                    <div class="level-progress" id="l1-progress-text">迷霧森林：第 1 / 5 題</div>
+                    <div class="timer-box">
+                        <span class="timer-icon">⏳</span>
+                        <span id="l1-timer-text">30 秒</span>
+                    </div>
+                </div>
+
+                <div class="timer-bar-track">
+                    <div id="l1-timer-bar" class="timer-bar-fill"></div>
+                </div>
+
+                <div class="forest-stage-interactive">
+                    <!-- 上層樹林跑馬燈向左滾動 (連續重複循環補樹) -->
+                    <div class="forest-marquee top-marquee">
+                        <div class="marquee-track">
+                            <span class="marquee-chunk">🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 </span>
+                            <span class="marquee-chunk">🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 </span>
+                        </div>
+                    </div>
+
+                    <!-- 道路分岔指示背景線條 -->
+                    <div class="roads-fork-layer">
+                        <div class="fork-road road-a-track"><span>A 路線</span></div>
+                        <div class="fork-road road-b-track"><span>B 路線</span></div>
+                        <div class="fork-road road-c-track"><span>C 路線</span></div>
+                    </div>
+
+                    <!-- 下層樹林跑馬燈向左滾動 (連續重複循環補樹) -->
+                    <div class="forest-marquee bottom-marquee">
+                        <div class="marquee-track">
+                            <span class="marquee-chunk">🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 </span>
+                            <span class="marquee-chunk">🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 🌲 </span>
+                        </div>
+                    </div>
+
+                    <!-- 角色動態舞台 -->
+                    <div class="forest-stage-actors">
+                        <!-- 黑熊 (使用原本 emoji 🐻) -->
+                        <div id="l1-bear-sprite" class="bear-char-box bear-running">🐻</div>
+
+                        <!-- 勇者向右奔跑跳動 -->
+                        <div id="l1-hero-sprite" class="hero-char-box hero-running">
+                            <svg viewBox="0 0 100 100" class="hero-svg-main">
+                                <path d="M25 45 C15 50 10 75 22 85 C35 75 40 65 35 48 Z" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                                <path d="M75 45 C85 50 90 75 78 85 C65 75 60 65 65 48 Z" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+                                <rect x="34" y="48" width="32" height="30" rx="4" fill="#2563eb" stroke="#1e3a8a" stroke-width="2"/>
+                                <rect x="34" y="65" width="32" height="6" fill="#78350f"/>
+                                <rect x="46" y="64" width="8" height="8" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
+                                <rect x="37" y="78" width="10" height="12" rx="2" fill="#92400e"/>
+                                <rect x="53" y="78" width="10" height="12" rx="2" fill="#92400e"/>
+                                <circle cx="50" cy="40" r="22" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+                                <path d="M25 35 L32 15 L40 26 L50 10 L60 26 L68 15 L75 35 L76 46 L70 42 L65 45 L50 36 L35 45 L30 42 L24 46 Z" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+                                <path d="M28 35 Q50 30 72 35" stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round"/>
+                                <circle cx="50" cy="31" r="5" fill="#ef4444" stroke="#f59e0b" stroke-width="1.5"/>
+                                <ellipse cx="42" cy="42" rx="3.5" ry="4.5" fill="#0f172a"/>
+                                <ellipse cx="58" cy="42" rx="3.5" ry="4.5" fill="#0f172a"/>
+                                <circle cx="43" cy="40" r="1.2" fill="#fff"/>
+                                <circle cx="59" cy="40" r="1.2" fill="#fff"/>
+                                <path d="M38 35 L45 37" stroke="#78350f" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M62 35 L55 37" stroke="#78350f" stroke-width="2" stroke-linecap="round"/>
+                                <g transform="translate(18, 25) rotate(-20)">
+                                    <path d="M10 0 L15 10 L12 45 L8 45 L5 10 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+                                    <line x1="10" y1="5" x2="10" y2="45" stroke="#94a3b8" stroke-width="1"/>
+                                    <rect x="2" y="45" width="16" height="4" rx="1" fill="#f59e0b" stroke="#b45309" stroke-width="1"/>
+                                    <rect x="8" y="49" width="4" height="12" fill="#92400e"/>
+                                    <circle cx="10" cy="62" r="3" fill="#f59e0b"/>
+                                </g>
+                                <g transform="translate(68, 48)">
+                                    <path d="M0 0 L20 0 C22 18 18 32 10 38 C2 32 -2 18 0 0 Z" fill="#fef08a" stroke="#d97706" stroke-width="3"/>
+                                    <path d="M4 4 L16 4 C18 16 14 26 10 30 C6 26 2 16 4 4 Z" fill="#fff" stroke="#f59e0b" stroke-width="1"/>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <!-- 死路障礙物 (回答錯誤時顯示) -->
+                        <div id="l1-obstacle" class="forest-dead-end hidden">🪨 死路</div>
+                    </div>
+
+                    <!-- 順利通行間隔 1 秒提示橫幅 -->
+                    <div id="l1-pass-notice" class="pass-notice-banner hidden"></div>
+
+                </div>
+
+                <!-- 題目與道路選項統一顯示在背景舞台下方 -->
+                <div class="l1-bottom-question-panel">
+                    <div class="q-label">🌲 迷霧森林算術題 (請計算正確數值，點選或按鍵盤 1/2/3 逃脫)：</div>
+                    <div id="l1-question-expr" class="q-expr">35 ＋ 86 ＝ ？</div>
+                    <div class="l1-bottom-options-row">
+                        <div id="l1-options" class="l1-options-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 畫面 4: Level 2 魔法村莊 (附魔與融合，答對閃黃光，答錯閃紅光) -->
+        <main id="screen-level2" class="game-screen hidden">
+            <div class="level-container">
+                <div class="level-topbar">
+                    <button class="pixel-btn-secondary back-to-map-btn">⬅ 返回地圖</button>
+                    <div class="level-progress" id="l2-progress-text">魔法鎖進度：第 1 / 10 道鎖</div>
+                    <div class="timer-box">
+                        <span class="timer-icon">⏳</span>
+                        <span id="l2-timer-text">30 秒</span>
+                    </div>
+                </div>
+
+                <div class="timer-bar-track">
+                    <div id="l2-timer-bar" class="timer-bar-fill"></div>
+                </div>
+
+                <div class="village-stage">
+                    <div class="durability-panel">
+                        <span>神劍耐久度：</span>
+                        <div id="l2-durability-dots" class="durability-dots"></div>
+                        <span class="durability-hint">(破裂 3 次神劍損毀重來)</span>
+                    </div>
+
+                    <div class="locks-track-panel">
+                        <div class="track-label">10 道魔法鎖進度：</div>
+                        <div id="l2-locks-track" class="locks-track"></div>
+                    </div>
+
+                    <div class="forge-altar">
+                        <!-- 祭壇神劍 (答對閃黃光、答錯閃紅光) -->
+                        <div class="magic-sword-altar-box">
+                            <div id="l2-altar-sword" class="altar-sword-sprite">
+                                <svg viewBox="0 0 80 140" class="altar-sword-svg">
+                                    <defs>
+                                        <filter id="sword-glow">
+                                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                            <feMerge>
+                                                <feMergeNode in="coloredBlur"/>
+                                                <feMergeNode in="SourceGraphic"/>
+                                            </feMerge>
+                                        </filter>
+                                    </defs>
+                                    <!-- 劍尖與劍身 -->
+                                    <path d="M40 5 L50 25 L46 95 L34 95 L30 25 Z" fill="#93c5fd" stroke="#1d4ed8" stroke-width="2.5"/>
+                                    <line x1="40" y1="12" x2="40" y2="95" stroke="#bfdbfe" stroke-width="2"/>
+                                    <!-- 劍格金飾 -->
+                                    <rect x="20" y="95" width="40" height="8" rx="3" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>
+                                    <circle cx="40" cy="99" r="4" fill="#3b82f6" stroke="#1d4ed8" stroke-width="1.5"/>
+                                    <!-- 劍柄 -->
+                                    <rect x="36" y="103" width="8" height="24" rx="2" fill="#78350f"/>
+                                    <!-- 劍首 -->
+                                    <circle cx="40" cy="132" r="7" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="fusion-instruction">
+                            🔮 <strong>操作方式：</strong>點選式子中「<strong>要先計算的兩個數字</strong>」，兩數會自動融合！直到剩下一個數即可解鎖！
+                            <div class="rule-reminder">記住口訣：<strong>先乘除後加減、括號要先算！</strong></div>
+                        </div>
+
+                        <!-- 融合運算式方塊區 -->
+                        <div id="l2-expr-container" class="fusion-tokens-container"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 畫面 5: Level 3 神殿祕寶 (冒險闖關、勇者走入神殿、石門開啟動態) -->
+        <main id="screen-level3" class="game-screen hidden">
+            <div class="level-container">
+                <div class="level-topbar">
+                    <button class="pixel-btn-secondary back-to-map-btn">⬅ 返回地圖</button>
+                    <div class="level-progress" id="l3-progress-text">神殿石門進度：第 1 / 10 扇門</div>
+                    <div class="timer-box">
+                        <span class="timer-icon">⏳</span>
+                        <span id="l3-timer-text">30 秒</span>
+                    </div>
+                </div>
+
+                <div class="timer-bar-track">
+                    <div id="l3-timer-bar" class="timer-bar-fill"></div>
+                </div>
+
+                <div class="temple-stage">
+                    <div class="durability-panel">
+                        <span>神殿石門承受度：</span>
+                        <div id="l3-durability-dots" class="durability-dots"></div>
+                        <span class="durability-hint">(門碎 3 次神殿垮掉重來)</span>
+                    </div>
+
+                    <!-- 2D 橫向卷軸神殿冒險地城 -->
+                    <div class="temple-2d-scroller">
+                        <!-- 遠景石壁與古代符文層 (向左滾動) -->
+                        <div class="temple-parallax-bg"></div>
+
+                        <!-- 中景石柱 (火已消掉) -->
+                        <div class="temple-mid-pillars"></div>
+
+                        <!-- 2D 橫向平鋪石板地面 (向左移動) -->
+                        <div class="temple-scrolling-floor"></div>
+
+                        <!-- 勇者手持劍盾在神殿地城奔跑闖關 -->
+                        <div id="l3-hero-sprite" class="hero-temple-sprite hero-side-running">
+                            <svg viewBox="0 0 100 100" class="hero-svg-temple">
+                                <path d="M25 45 C15 50 10 75 22 85 C35 75 40 65 35 48 Z" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                                <path d="M75 45 C85 50 90 75 78 85 C65 75 60 65 65 48 Z" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+                                <rect x="34" y="48" width="32" height="30" rx="4" fill="#2563eb" stroke="#1e3a8a" stroke-width="2"/>
+                                <rect x="34" y="65" width="32" height="6" fill="#78350f"/>
+                                <rect x="46" y="64" width="8" height="8" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
+                                <rect x="37" y="78" width="10" height="12" rx="2" fill="#92400e"/>
+                                <rect x="53" y="78" width="10" height="12" rx="2" fill="#92400e"/>
+                                <circle cx="50" cy="40" r="22" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+                                <path d="M25 35 L32 15 L40 26 L50 10 L60 26 L68 15 L75 35 L76 46 L70 42 L65 45 L50 36 L35 45 L30 42 L24 46 Z" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+                                <path d="M28 35 Q50 30 72 35" stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round"/>
+                                <circle cx="50" cy="31" r="5" fill="#ef4444" stroke="#f59e0b" stroke-width="1.5"/>
+                                <ellipse cx="42" cy="42" rx="3.5" ry="4.5" fill="#0f172a"/>
+                                <ellipse cx="58" cy="42" rx="3.5" ry="4.5" fill="#0f172a"/>
+                                <circle cx="43" cy="40" r="1.2" fill="#fff"/>
+                                <circle cx="59" cy="40" r="1.2" fill="#fff"/>
+                                <g transform="translate(18, 25) rotate(-20)">
+                                    <path d="M10 0 L15 10 L12 45 L8 45 L5 10 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+                                    <rect x="2" y="45" width="16" height="4" rx="1" fill="#f59e0b"/>
+                                    <rect x="8" y="49" width="4" height="12" fill="#92400e"/>
+                                </g>
+                                <g transform="translate(68, 48)">
+                                    <path d="M0 0 L20 0 C22 18 18 32 10 38 C2 32 -2 18 0 0 Z" fill="#fef08a" stroke="#d97706" stroke-width="3"/>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <!-- 古老神殿石門 / 最終寶藏大門 -->
+                        <div id="l3-stone-door" class="stone-door-container">
+                            <div id="l3-door-frame" class="door-frame">
+                                <div id="l3-door-crest" class="door-crest">🏛️ 第 1 號門</div>
+                                <div class="door-equation-box">
+                                    <div id="l3-door-label" class="door-equation-label">門上四則運算式 (按 Enter 確認)：</div>
+                                    <div id="l3-door-expr" class="door-equation-text">120 − (15 ＋ 25) × 2 ＝ ？</div>
+                                </div>
+
+                                <div class="keypad-panel">
+                                    <div class="input-display-row">
+                                        <input type="text" id="l3-input-display" class="keypad-display" placeholder="點擊或敲鍵盤數字" readonly>
+                                        <button class="pixel-btn pixel-btn-danger" onclick="GameApp.clearL3Input()">清除</button>
+                                    </div>
+                                    <div class="virtual-keypad">
+                                        <button class="num-key" onclick="GameApp.appendL3Input('1')">1</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('2')">2</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('3')">3</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('4')">4</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('5')">5</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('6')">6</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('7')">7</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('8')">8</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('9')">9</button>
+                                        <button class="num-key" onclick="GameApp.backspaceL3Input()">⌫</button>
+                                        <button class="num-key" onclick="GameApp.appendL3Input('0')">0</button>
+                                        <button id="l3-submit-btn" class="pixel-btn pixel-btn-primary submit-door-key" onclick="GameApp.submitL3Answer()">🚪 開門</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 第 10 題開啟寶藏特效 -->
+                            <div id="l3-treasure-chest-anim" class="treasure-chest-box hidden">
+                                <div class="treasure-glow-ring"></div>
+                                <div class="treasure-chest-icon">💎 👑 🪙</div>
+                                <div class="treasure-shield-rise">🛡️ 重生之盾</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 畫面 6: 魔王關 討伐魔龍 (使用原本 emoji 魔龍 🐲🔥，火球飄向勇者，劍氣斬滅火球) -->
+        <main id="screen-boss" class="game-screen hidden">
+            <div class="level-container">
+                <div class="level-topbar">
+                    <button class="pixel-btn-secondary back-to-map-btn">⬅ 撤退</button>
+                    <div class="level-progress" id="boss-round-info">魔王討伐戰</div>
+                    <div class="timer-box">
+                        <span class="timer-icon">⏳</span>
+                        <span id="boss-timer-text">60 秒</span>
+                    </div>
+                </div>
+
+                <div class="timer-bar-track">
+                    <div id="boss-timer-bar" class="timer-bar-fill"></div>
+                </div>
+
+                <div class="boss-battle-stage">
+                    <div class="boss-health-row">
+                        <div class="dragon-stat-box">
+                            <div class="stat-name">🐲 魔龍血量 (5血)：</div>
+                            <div id="boss-dragon-hp" class="hp-bar-pips"></div>
+                        </div>
+                        <div class="hero-stat-box">
+                            <div class="stat-name">🧙‍♂️ 勇者生命 (3命)：</div>
+                            <div id="boss-hero-hp" class="hp-bar-pips"></div>
+                        </div>
+                    </div>
+
+                    <!-- 戰鬥決戰舞台 -->
+                    <div class="arena-display-dynamic">
+                        <!-- 勇者 -->
+                        <div id="boss-hero-sprite" class="hero-battle-box">
+                            <svg viewBox="0 0 100 100" class="hero-svg-battle">
+                                <path d="M25 45 C15 50 10 75 22 85 C35 75 40 65 35 48 Z" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                                <path d="M75 45 C85 50 90 75 78 85 C65 75 60 65 65 48 Z" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+                                <rect x="34" y="48" width="32" height="30" rx="4" fill="#2563eb" stroke="#1e3a8a" stroke-width="2"/>
+                                <rect x="34" y="65" width="32" height="6" fill="#78350f"/>
+                                <rect x="46" y="64" width="8" height="8" fill="#fbbf24" stroke="#d97706" stroke-width="1.5"/>
+                                <rect x="37" y="78" width="10" height="12" rx="2" fill="#92400e"/>
+                                <rect x="53" y="78" width="10" height="12" rx="2" fill="#92400e"/>
+                                <circle cx="50" cy="40" r="22" fill="#fde68a" stroke="#d97706" stroke-width="2"/>
+                                <path d="M25 35 L32 15 L40 26 L50 10 L60 26 L68 15 L75 35 L76 46 L70 42 L65 45 L50 36 L35 45 L30 42 L24 46 Z" fill="#b45309" stroke="#78350f" stroke-width="2"/>
+                                <path d="M28 35 Q50 30 72 35" stroke="#f59e0b" stroke-width="5" fill="none" stroke-linecap="round"/>
+                                <circle cx="50" cy="31" r="5" fill="#ef4444" stroke="#f59e0b" stroke-width="1.5"/>
+                                <ellipse cx="42" cy="42" rx="3.5" ry="4.5" fill="#0f172a"/>
+                                <ellipse cx="58" cy="42" rx="3.5" ry="4.5" fill="#0f172a"/>
+                                <circle cx="43" cy="40" r="1.2" fill="#fff"/>
+                                <circle cx="59" cy="40" r="1.2" fill="#fff"/>
+                                <g id="boss-hero-sword-group" transform="translate(14, 20) rotate(-15)">
+                                    <path d="M10 0 L15 10 L12 48 L8 48 L5 10 Z" fill="#93c5fd" stroke="#1d4ed8" stroke-width="1.8"/>
+                                    <line x1="10" y1="5" x2="10" y2="48" stroke="#bfdbfe" stroke-width="1.5"/>
+                                    <rect x="2" y="48" width="16" height="4" rx="1" fill="#f59e0b"/>
+                                    <rect x="8" y="52" width="4" height="12" fill="#92400e"/>
+                                </g>
+                                <g transform="translate(68, 48)">
+                                    <path d="M0 0 L20 0 C22 18 18 32 10 38 C2 32 -2 18 0 0 Z" fill="#fef08a" stroke="#d97706" stroke-width="3"/>
+                                    <path d="M4 4 L16 4 C18 16 14 26 10 30 C6 26 2 16 4 4 Z" fill="#fff" stroke="#f59e0b" stroke-width="1"/>
+                                </g>
+                            </svg>
+                            <div class="sprite-label">勇者 (劍盾神裝)</div>
+                        </div>
+
+                        <!-- 勇者釋放之凌厲劍氣 (斬擊火球) -->
+                        <div id="boss-slash-wave" class="slash-wave-sprite hidden">
+                            <svg viewBox="0 0 80 80" class="slash-svg">
+                                <path d="M15 10 Q65 40 15 70 Q45 40 15 10 Z" fill="#38bdf8" stroke="#fef08a" stroke-width="3" filter="drop-shadow(0 0 8px #38bdf8)"/>
+                            </svg>
+                        </div>
+
+                        <!-- 魔龍飄向勇者之龍焰火球 -->
+                        <div id="boss-floating-fireball" class="floating-fireball-sprite fire-floating">
+                            <div class="fireball-core">🔥</div>
+                            <div class="fireball-tail"></div>
+                        </div>
+
+                        <!-- 魔龍 (使用原本 emoji 🐲🔥) -->
+                        <div id="boss-dragon-sprite" class="dragon-battle-box dragon-emoji-box">
+                            <div class="dragon-emoji-avatar">🐲🔥</div>
+                            <div class="sprite-label">深淵魔龍</div>
+                        </div>
+                    </div>
+
+                    <!-- 魔龍技能式子 (挑戰者目標) -->
+                    <div class="dragon-skill-cast-box">
+                        <div class="cast-title">🔥 魔龍施展龍焰技能式子：</div>
+                        <div id="boss-dragon-expr" class="cast-expression">50 ＋ 20 × 3</div>
+                        <div class="cast-subtext">火球正飄向勇者！1 分鐘內找出下方<strong>相同數值</strong>之招式，揮劍滅火斬龍！</div>
+                    </div>
+
+                    <!-- 勇者 3 個攻擊方式 -->
+                    <div class="hero-attacks-section">
+                        <div class="attacks-title">⚔️ 選擇你的攻擊招式：</div>
+                        <div id="boss-attacks-container" class="attacks-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 畫面 7: 全破大結局 / 救出人質慶祝 & 頒發專屬稱號 -->
+        <main id="screen-victory" class="game-screen hidden">
+            <div class="victory-container">
+                <div class="victory-card">
+                    <div class="confetti-icon">🎊 🎉 👑 🎉 🎊</div>
+                    <h1 class="victory-title">魔龍被徹底討伐！人質平安獲救！</h1>
+                    <p class="victory-subtitle">恭喜勇者 <span id="victory-hero-name"></span>，你成功拯救了整個王國！</p>
+
+                    <!-- 獲封稱號徽章 -->
+                    <div class="victory-title-badge-wrap">
+                        <div class="title-badge-header">👑 國王親賜・專屬最高稱號 👑</div>
+                        <div id="victory-title-badge" class="victory-title-badge">神話級・算術大聖皇 👑</div>
+                    </div>
+
+                    <div class="victory-art-box">
+                        <div class="victory-pixel-characters">
+                            <span>👸</span>
+                            <span>❤️</span>
+                            <span>🧙‍♂️</span>
+                        </div>
+                    </div>
+
+                    <div class="victory-stats-panel">
+                        <div class="v-stat-item">
+                            <span class="v-label">魔王關評定星數：</span>
+                            <span id="victory-stars" class="v-val">★★★</span>
+                        </div>
+                        <div class="v-stat-item">
+                            <span class="v-label">魔王關得分：</span>
+                            <span id="victory-score" class="v-val">100 分</span>
+                        </div>
+                        <div class="v-stat-item">
+                            <span class="v-label">戰鬥耗時：</span>
+                            <span id="victory-time" class="v-val">1分15秒</span>
+                        </div>
+                        <div class="v-stat-item">
+                            <span class="v-label">失誤次數：</span>
+                            <span id="victory-errors" class="v-val">0 次</span>
+                        </div>
+                    </div>
+
+                    <div class="certificate-box">
+                        <div class="cert-title">📜 王國算術特級榮譽獎狀</div>
+                        <div id="victory-cert-body" class="cert-body">
+                            茲證明勇者已徹底精通「先乘除後加減」、「括號要先算」之整數四則運算奧義，獲封王國大守護者榮銜！
+                        </div>
+                    </div>
+
+                    <button id="download-cert-btn" class="pixel-btn pixel-btn-success full-width" style="margin-bottom: 12px; font-size: 15px;" onclick="GameApp.downloadCertificate()">📥 下載電子榮譽獎狀 (圖片)</button>
+                    <button class="pixel-btn pixel-btn-primary full-width" onclick="GameApp.showScreen('map')">🗺️ 返回冒險地圖</button>
+                </div>
+            </div>
+        </main>
+
+
+        <!-- 全局結果通知彈窗 (過關 / 失敗 / 提示) -->
+        <div id="game-result-modal" class="modal-backdrop hidden" style="z-index: 10000;">
+            <div class="modal-card">
+                <h3 id="result-modal-title" class="modal-title">結果通知</h3>
+                <div id="result-modal-msg" class="modal-content"></div>
+                <div class="modal-footer">
+                    <button id="result-modal-btn" class="pixel-btn pixel-btn-primary full-width">確認</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 排行榜彈跳視窗 -->
+        <div id="leaderboard-modal" class="modal-backdrop hidden" style="z-index: 10200; align-items: flex-start; padding-top: 40px;">
+            <div class="modal-card" style="max-width: 620px; width: 100%; max-height: 85vh; display: flex; flex-direction: column;">
+                <h3 class="modal-title" style="font-size: 18px;">🏆 勇者算術大冒險 排行榜</h3>
+
+                <!-- 篩選控制列 -->
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center;">
+                    <!-- 排行類型 -->
+                    <div style="display: flex; border: 2px solid #6366f1; border-radius: 6px; overflow: hidden;">
+                        <button id="lb-type-count" class="lb-tab-btn active" onclick="GameApp.switchLeaderboardType('count')" style="flex: 1; padding: 5px 10px; font-size: 12px; background: #6366f1; color: #fff; border: none; cursor: pointer; font-family: inherit;">通關次數</button>
+                        <button id="lb-type-time" class="lb-tab-btn" onclick="GameApp.switchLeaderboardType('time')" style="flex: 1; padding: 5px 10px; font-size: 12px; background: transparent; color: #a5b4fc; border: none; cursor: pointer; font-family: inherit;">通關時間</button>
+                    </div>
+                    <!-- 伺服器範圍 -->
+                    <div style="display: flex; border: 2px solid #6366f1; border-radius: 6px; overflow: hidden;">
+                        <button id="lb-scope-all" class="lb-tab-btn active" onclick="GameApp.switchLeaderboardScope('all')" style="flex: 1; padding: 5px 10px; font-size: 12px; background: #6366f1; color: #fff; border: none; cursor: pointer; font-family: inherit;">全伺服器</button>
+                        <button id="lb-scope-server" class="lb-tab-btn" onclick="GameApp.switchLeaderboardScope('server')" style="flex: 1; padding: 5px 10px; font-size: 12px; background: transparent; color: #a5b4fc; border: none; cursor: pointer; font-family: inherit;">限定伺服器</button>
+                    </div>
+                    <!-- 限定伺服器輸入 -->
+                    <div id="lb-server-filter-wrap" style="display: none; align-items: center; gap: 4px;">
+                        <input type="text" id="lb-server-input" class="pixel-input" style="width: 60px; font-size: 12px; padding: 4px 6px;" placeholder="001" maxlength="3" value="001">
+                        <button onclick="GameApp.refreshLeaderboard()" class="pixel-btn pixel-btn-primary" style="padding: 4px 10px; font-size: 12px;">查詢</button>
+                    </div>
+                </div>
+
+                <!-- 排行榜內容 -->
+                <div id="leaderboard-content" style="overflow-y: auto; flex: 1; min-height: 200px;">
+                    <div style="text-align: center; color: #64748b; padding: 30px;">載入中…</div>
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <button class="pixel-btn pixel-btn-secondary full-width" onclick="GameApp.closeLeaderboard()">關閉</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 冒險重生確認彈跳視窗 (Requirement 8) -->
+        <div id="rebirth-modal" class="modal-backdrop hidden" style="z-index: 10000;">
+            <div class="modal-card" style="max-width: 440px;">
+                <h3 class="modal-title">🔄 確定要重生嗎？</h3>
+                <div class="modal-content" style="text-align: left;">
+                    <div style="font-size: 42px; text-align: center; margin-bottom: 10px;">🌟🔄🛡️</div>
+                    <div style="color: #f59e0b; font-weight: bold; font-size: 16px; margin-bottom: 10px; text-align: center;">
+                        重置當前進度，再次開啟英雄旅程！
+                    </div>
+                    <div style="background: #1c152d; border: 2px dashed #f59e0b; padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.7; color: #cbd5e1; margin-bottom: 14px;">
+                        • 冒險關卡進度、獲得之傳奇神裝將會重置<br>
+                        • 當前錯題筆記本與【🏅 一般成就】將會重置<br>
+                        • <strong style="color: #34d399;">【🏆 隱藏成就】永久保留！</strong><br>
+                        • <strong style="color: #38bdf8;">歷史遊玩紀錄與最佳分數永久保留！</strong>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="rebirth-confirm-btn" class="pixel-btn btn-rebirth full-width" onclick="GameApp.confirmResetAdventure()">確認重生</button>
+                    <button class="pixel-btn pixel-btn-secondary full-width" onclick="GameApp.closeRebirthModal()">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理員密碼輸入彈跳視窗 (Requirement 7) -->
+        <div id="admin-pwd-modal" class="modal-backdrop hidden" style="z-index: 10500;">
+            <div class="modal-card" style="max-width: 380px;">
+                <h3 class="modal-title">🔑 管理員密碼認證</h3>
+                <div class="modal-content" style="text-align: left; margin-bottom: 14px;">
+                    <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 8px;">請輸入後台管理密碼：</div>
+                    <input type="password" id="admin-login-pwd-input" class="pixel-input full-width" placeholder="請輸入密碼" autocomplete="current-password">
+                    <div id="admin-pwd-error-msg" style="color: #ef4444; font-size: 12px; margin-top: 6px; min-height: 16px;"></div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="admin-pwd-submit-btn" class="pixel-btn pixel-btn-primary full-width">確認登入</button>
+                    <button id="admin-pwd-cancel-btn" class="pixel-btn pixel-btn-secondary full-width">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 勇者背包彈窗 (成就與錯題筆記本) -->
+        <div id="backpack-modal" class="modal-backdrop hidden">
+            <div class="backpack-modal-card">
+                <div class="backpack-modal-header">
+                    <div class="backpack-title">
+                        <span>🎒 勇者專屬背包</span>
+                        <span class="backpack-subtitle">榮譽成就 ＆ 錯題筆記</span>
+                    </div>
+                    <button id="backpack-close-btn" class="modal-close-x">✖</button>
+                </div>
+                <div class="backpack-tabs">
+                    <button id="btn-tab-achieve" class="backpack-tab-btn active">🏅 冒險成就</button>
+                    <button id="btn-tab-notebook" class="backpack-tab-btn">📖 錯題筆記本</button>
+                </div>
+                <div class="backpack-content">
+                    <!-- 成就列表分頁 -->
+                    <div id="panel-achievements" class="backpack-panel">
+                        <div class="achieve-section-title">一般成就 🏅</div>
+                        <div id="general-achievements-list" class="achieve-grid"></div>
+                        <div class="achieve-section-title" style="margin-top: 16px;">隱藏成就 🏆</div>
+                        <div id="hidden-achievements-list" class="achieve-grid"></div>
+                    </div>
+
+                    <!-- 錯題筆記本分頁 -->
+                    <div id="panel-notebook" class="backpack-panel hidden">
+                        <div class="notebook-hint">💡 記錄本次冒險的錯題，可隨時重新作答訂正！</div>
+                        <div id="notebook-list" class="notebook-cards-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 浮動成就解鎖通知容器 (支援多成就同時堆疊顯示) -->
+        <div id="achievement-popup" class="achievement-toast-wrap hidden"></div>
+
+        <!-- 後台管理彈窗 (密碼 TYC1011) -->
+        <div id="admin-modal" class="modal-backdrop hidden">
+            <div class="admin-modal-card">
+                <div class="admin-modal-header">
+                    <div class="admin-title">
+                        <span>🛡️ 教師/管理員後台管理系統</span>
+                        <span class="admin-badge">認證通過</span>
+                    </div>
+                    <button id="admin-close-btn" class="modal-close-x">✖</button>
+                </div>
+
+                <div class="admin-body">
+                    <!-- 伺服器分流篩選控制欄 -->
+                    <div class="admin-server-filter-bar">
+                        <span class="filter-label">🔍 選擇伺服器 (001~999)：</span>
+                        <input type="text" id="admin-server-filter-input" class="pixel-input admin-filter-input" placeholder="例如 001" maxlength="3">
+                        <button id="admin-server-filter-btn" class="pixel-btn-primary" style="padding: 6px 14px; font-size: 13px; border-radius: 4px; cursor: pointer;">篩選</button>
+                        <button id="admin-server-filter-all-btn" class="pixel-btn-secondary" style="padding: 6px 14px; font-size: 13px; border-radius: 4px; cursor: pointer;">顯示全部</button>
+                        <span id="admin-current-filter-status" class="filter-status-hint">目前顯示：全部伺服器</span>
+                    </div>
+
+                    <!-- 伺服器各關題數調整 (至少 5 題) -->
+                    <div class="admin-server-config-card">
+                        <div class="admin-config-title">⚙️ 伺服器各關題數設定 (每關至少 5 題，分數為 100/題數 四捨五入)：</div>
+                        <div class="admin-config-row">
+                            <label>伺服器：<input type="text" id="admin-cfg-server" class="pixel-input" placeholder="001" style="width:65px; text-align:center;" maxlength="3" value="001"></label>
+                            <label>第1關題數：<input type="number" id="admin-cfg-l1" class="pixel-input" min="5" max="30" value="5" style="width:65px; text-align:center;"></label>
+                            <label>第2關題數：<input type="number" id="admin-cfg-l2" class="pixel-input" min="5" max="30" value="10" style="width:65px; text-align:center;"></label>
+                            <label>第3關題數：<input type="number" id="admin-cfg-l3" class="pixel-input" min="5" max="30" value="10" style="width:65px; text-align:center;"></label>
+                            <button id="admin-cfg-save-btn" class="pixel-btn-primary" style="padding: 6px 12px; font-size: 13px;">💾 儲存該伺服器題數</button>
+                            <span id="admin-cfg-status" style="font-size: 12px; color: #10b981; margin-left: 6px;"></span>
+                        </div>
+                    </div>
+
+                    <!-- 全體統計卡片 -->
+                    <div id="admin-stats-summary" class="admin-stats-grid"></div>
+
+                    <!-- 操作工具列 (包含下載 CSV) -->
+                    <div class="admin-toolbar">
+                        <div class="toolbar-left">
+                            <button id="admin-sync-btn" class="pixel-btn-primary" style="padding: 8px 14px; font-size: 14px; border-radius: 4px;">🔄 即時同步所有裝置資料</button>
+                            <button id="admin-toggle-mode-btn" class="pixel-btn-secondary">切換為：顯示星數 (★)</button>
+                            <button id="admin-download-csv-btn" class="pixel-btn-success" style="padding: 8px 14px; font-size: 14px; border-radius: 4px;">📥 下載玩家答題資料 (CSV)</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button id="admin-clear-all-btn" class="pixel-btn-danger">⚠️ 清空所有資料 (ID重置為AAA11111)</button>
+                        </div>
+                    </div>
+
+                    <!-- 每一位遊玩者詳細列表 -->
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>伺服器</th>
+                                    <th>勇者 / ID</th>
+                                    <th>第1關 (迷霧)</th>
+                                    <th>第2關 (村莊)</th>
+                                    <th>第3關 (神殿)</th>
+                                    <th>Boss (魔龍)</th>
+                                    <th>各關最少耗時</th>
+                                    <th>各關最少答錯</th>
+                                    <th>錯題訂正狀況</th>
+                                    <th>累計重來</th>
+                                    <th>通關次數</th>
+                                    <th>管理操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-user-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 後台：單一玩家詳細紀錄彈窗 (每次紀錄、最佳紀錄、最新紀錄與錯題訂正明細) -->
+        <div id="admin-user-detail-modal" class="modal-backdrop hidden">
+            <div class="admin-detail-card">
+                <div class="admin-modal-header">
+                    <div class="admin-title">
+                        <span id="detail-user-title">🔍 玩家詳細冒險紀錄</span>
+                    </div>
+                    <button id="admin-detail-close-btn" class="modal-close-x">✖</button>
+                </div>
+                <div class="admin-detail-body">
+                    <!-- 玩家基本身分與封號 -->
+                    <div id="detail-user-header" class="detail-user-info-box"></div>
+
+                    <!-- 最佳紀錄卡片 -->
+                    <div class="detail-section-title">🌟 各關最佳紀錄 (Best Records)</div>
+                    <div id="detail-best-records" class="detail-records-grid"></div>
+
+                    <!-- 最新紀錄卡片 -->
+                    <div class="detail-section-title" style="margin-top: 14px;">⏱️ 最新紀錄 (Latest Records)</div>
+                    <div id="detail-latest-records" class="detail-records-grid"></div>
+
+                    <!-- 歷次遊玩歷史清單 -->
+                    <div class="detail-section-title" style="margin-top: 14px;">📜 歷次挑戰詳細紀錄清單</div>
+                    <div class="detail-history-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>時間</th>
+                                    <th>挑戰關卡</th>
+                                    <th>得分</th>
+                                    <th>星數</th>
+                                    <th>耗時</th>
+                                    <th>失誤</th>
+                                    <th>結果</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-history-tbody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- 錯題筆記本訂正明細清單 -->
+                    <div class="detail-section-title" style="margin-top: 14px;">📖 錯題筆記本訂正明細清單</div>
+                    <div class="detail-history-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>時間</th>
+                                    <th>關卡</th>
+                                    <th>題目</th>
+                                    <th>學生選擇</th>
+                                    <th>正確答案</th>
+                                    <th>訂正狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-notebook-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 載入腳本 -->
+    <script src="audio.js"></script>
+    <script src="math_engine.js"></script>
+    <script src="storage.js"></script>
+    <script src="admin.js"></script>
+    <script src="game.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            GameApp.init();
+            AdminDashboard.init();
+        });
+    </script>
+</body>
+</html>
